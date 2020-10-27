@@ -20,9 +20,10 @@ class DebugLineRendererSystem : IteratingDslSystem(
   lateinit var shapeRenderer: ShapeRenderer
 
   override fun process(entityId: Int) {
-    shapeRenderer.set(ShapeRenderer.ShapeType.Line)
+    shapeRenderer.begin(ShapeRenderer.ShapeType.Line)
     shapeRenderer.color = entityId[mColor].value
     val l = entityId[mLine]
     shapeRenderer.line(l.v0, l.v1)
+    shapeRenderer.end()
   }
 }

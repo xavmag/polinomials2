@@ -24,10 +24,11 @@ class DebugRectRendererSystem : IteratingDslSystem(
   lateinit var shapeRenderer: ShapeRenderer
 
   override fun process(entityId: Int) {
-    shapeRenderer.set(ShapeRenderer.ShapeType.Line)
+    shapeRenderer.begin(ShapeRenderer.ShapeType.Line)
     shapeRenderer.color = entityId[mColor].value
-    val pos = entityId[mPosition].value
+    val pos = entityId[mPosition].vec
     val size = entityId[mSize].value
     shapeRenderer.rect(pos, size)
+    shapeRenderer.end()
   }
 }

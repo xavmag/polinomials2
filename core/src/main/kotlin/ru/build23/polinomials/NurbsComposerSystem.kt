@@ -20,8 +20,8 @@ class NurbsComposerSystem : IteratingDslSystem(
   override fun process(entityId: Int) {
     val points = entityId[mPoints].values
     val nurbs = entityId[mNurbs]
-    repeat(Global.NURBS_ITERATIONS) {
-      val v = curvePoint(nurbs.degree, entityId[mKnots].values, nurbs.controlPoints, it.toFloat() / Global.NURBS_ITERATIONS)
+    repeat(Global.CURVE_ITERATIONS) {
+      val v = curvePoint(nurbs.degree, entityId[mKnots].values, nurbs.controlPoints, it.toFloat() / Global.CURVE_ITERATIONS)
       points.add(v.x, v.y)
     }
     val v = curvePoint(nurbs.degree, entityId[mKnots].values, nurbs.controlPoints, 1f)

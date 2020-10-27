@@ -1,60 +1,93 @@
 package ru.build23.polinomials
 
+import com.artemis.Entity
 import com.artemis.InvocationStrategy
 import com.artemis.World
+import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.Input
+import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
+import com.badlogic.gdx.scenes.scene2d.Actor
+import com.badlogic.gdx.scenes.scene2d.InputEvent
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
+import com.badlogic.gdx.scenes.scene2d.utils.DragListener
 import com.badlogic.gdx.utils.Disposable
+import com.badlogic.gdx.utils.viewport.FitViewport
 import com.badlogic.gdx.utils.viewport.ScreenViewport
 import ktx.actors.stage
-import ru.build23.polinomials.Global.mNurbs
+import ktx.app.clearScreen
+import ktx.math.vec3
+import ktx.scene2d.label
+import ktx.scene2d.scene2d
+import ru.build23.polinomials.Global.mode
+import ru.build23.polinomials.artemis.add
 import ru.build23.polinomials.artemis.entity
-import ru.build23.polinomials.artemis.get
 import ru.build23.polinomials.artemis.worldConfiguration
 
+enum class Mode {
+  Create, Edit, Delete
+}
+
 class App(
-  private val batch: SpriteBatch
+  batch: SpriteBatch
 ) : Disposable {
 
   private val world: World
   private val sceneCamera = OrthographicCamera()
   private val worldCamera = OrthographicCamera()
-  private val stage = stage(batch, ScreenViewport(sceneCamera))
+  val stage = stage(batch, FitViewport(Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat(), sceneCamera))
+  private val shapeRenderer = ShapeRenderer()
+
+  private val curve: Entity
 
   init {
     val config = worldConfiguration {
+      Gdx.input.inputProcessor = stage
       with(
         ControlPointAddSystem(),
         ControlPointDeleteSystem(),
         VelocitySystem(),
         CameraSystem(),
-        NurbsComposerSystem(),
+        BezierComposerSystem(),
         GridComposerSystem(),
         GridOutlineSystem(),
-        ShapeRendererBeginSystem(),
         CurveRendererSystem(),
         DebugLineRendererSystem(),
         DebugCircleRendererSystem(),
         DebugRectRendererSystem(),
-        ShapeRendererEndSystem(),
         StageRendererSystem()
       )
       register(InvocationStrategy())
     }.apply {
       register("scene_camera", sceneCamera)
       register("world_camera", worldCamera)
-      register(ShapeRenderer())
+      register(shapeRenderer)
       register(stage)
     }
     world = World(config)
     world.inject(Global)
 
     world.entity().camera()
-    val curve = world.entity().nurbs(3)
-    curve.controlPoint(100f, 100f)
-    curve.controlPoint(200f, 200f)
-    curve.controlPoint(250f, 100f)
+    curve = world.entity().bezier()
+
+    stage.addListener(object : ClickListener() {
+      override fun touchUp(event: InputEvent?, x: Float, y: Float, pointer: Int, button: Int) {
+        super.touchUp(event, x, y, pointer, button)
+        val pos = sceneCamera.unproject(vec3(x, sceneCamera.viewportHeight - y, 0f))
+        when (mode) {
+          Mode.Create -> {
+            curve.bezierCurvePoint(pos.x, pos.y)
+          }
+          Mode.Delete -> {
+            curve.deleteCurvePoint(pos.x, pos.y)
+          }
+          else -> {
+          }
+        }
+      }
+    })
   }
 
   fun resize(width: Int, height: Int) {
@@ -62,12 +95,20 @@ class App(
   }
 
   fun render(delta: Float) {
+    clearScreen(0f, 0f, 0f, 1f)
+    shapeRenderer.projectionMatrix = sceneCamera.combined
     world.delta = delta
     world.process()
+    if (Gdx.input.isKeyPressed(Input.Keys.Q)) {
+      mode = Mode.Create
+    } else if (Gdx.input.isKeyPressed(Input.Keys.E)) {
+      mode = Mode.Edit
+    }
   }
 
   override fun dispose() {
     world.dispose()
     stage.dispose()
+    shapeRenderer.dispose()
   }
 }

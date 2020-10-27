@@ -4,5 +4,5 @@ import com.artemis.Component
 import ktx.math.vec2
 
 class Position : Component() {
-  val value = vec2()
+  val vec = vec2()
 }

@@ -15,6 +15,15 @@ class Nurbs : Component() {
   val controlPoints = IntBag(4)
 }
 
+class BezierCurve : Component() {
+  @EntityId
+  val curveNodes = IntBag(4)
+}
+
+class BezierPrimitive : Component() {
+  val controlPoints = IntArray(4)
+}
+
 class CurvePoints : Component() {
   val values = GdxFloatArray()
 }

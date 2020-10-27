@@ -20,8 +20,10 @@ class CurveRendererSystem : IteratingDslSystem(
   lateinit var shapeRenderer: ShapeRenderer
 
   override fun process(entityId: Int) {
-    shapeRenderer.set(ShapeRenderer.ShapeType.Line)
+    shapeRenderer.begin(ShapeRenderer.ShapeType.Line)
     shapeRenderer.color = entityId[mColor].value
-    shapeRenderer.polyline(entityId[mPoints].values.toArray())
+    val values = entityId[mPoints].values.toArray()
+    shapeRenderer.polyline(values)
+    shapeRenderer.end()
   }
 }

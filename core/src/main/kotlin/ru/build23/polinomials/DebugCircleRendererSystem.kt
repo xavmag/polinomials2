@@ -23,8 +23,9 @@ class DebugCircleRendererSystem : IteratingDslSystem(
   lateinit var mColor: ComponentMapper<Color>
 
   override fun process(entityId: Int) {
-    shapeRenderer.set(ShapeRenderer.ShapeType.Line)
+    shapeRenderer.begin(ShapeRenderer.ShapeType.Line)
     shapeRenderer.color = entityId[mColor].value
-    shapeRenderer.circle(entityId[mPosition].value, entityId[mCircle].radius)
+    shapeRenderer.circle(entityId[mPosition].vec, entityId[mCircle].radius)
+    shapeRenderer.end()
   }
 }

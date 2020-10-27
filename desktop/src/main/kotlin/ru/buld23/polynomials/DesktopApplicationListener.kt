@@ -10,7 +10,9 @@ import com.kotcrab.vis.ui.VisUI
 import ktx.actors.stage
 import ktx.scene2d.scene2d
 import ktx.scene2d.table
+import ktx.scene2d.vis.visLabel
 import ru.build23.polinomials.App
+import tornadofx.Stylesheet.Companion.label
 
 class DesktopApplicationListener : ApplicationAdapter() {
   private lateinit var batch: SpriteBatch
@@ -21,6 +23,9 @@ class DesktopApplicationListener : ApplicationAdapter() {
     VisUI.load()
     batch = SpriteBatch()
     app = App(batch)
+    app.stage.addActor(scene2d.visLabel("Press Q to enter Create mode\nPress E to enter Edit mode") {
+      setPosition(25f, 25f)
+    })
   }
 
   override fun resize(width: Int, height: Int) {
